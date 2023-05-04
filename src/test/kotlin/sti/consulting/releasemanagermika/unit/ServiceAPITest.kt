@@ -27,9 +27,8 @@ class ServiceAPITest {
         MockitoAnnotations.openMocks(this)
     }
 
-    //This test case checks whether the deploy() method of ServiceAPI returns a ResponseEntity with a CREATED status and the correct service ID when a new service is deployed successfully.
     @Test
-    fun testDeploy() {
+    fun `should_return_created_status_and_id_when_deploying_service`() {
         val service = Service(name = "Test Service", version = 1L)
         `when`(serviceService.deployService(service)).thenReturn(1L)
 
@@ -39,7 +38,7 @@ class ServiceAPITest {
     }
 
     @Test
-    fun testDeployFailure() {
+    fun `should_return_internal_server_error_when_deploy_service_fails`() {
         val service = Service(name = "Test Service", version = 1L)
         `when`(serviceService.deployService(service)).thenReturn(null)
 
@@ -48,7 +47,7 @@ class ServiceAPITest {
     }
 
     @Test
-    fun testServices() {
+    fun `should_return_system_version_when_given_system_version_id_exists`() {
         val systemVersion = SystemVersion(listOf(Service(name = "Test Service", version = 1L)))
         `when`(serviceService.getSystemVersion(1L)).thenReturn(Optional.of(systemVersion))
 
@@ -58,7 +57,7 @@ class ServiceAPITest {
     }
 
     @Test
-    fun testServicesNotFound() {
+    fun `should_return_not_found_status_when_given_system_version_id_does_not_exist`() {
         `when`(serviceService.getSystemVersion(1L)).thenReturn(Optional.empty())
 
         val response = serviceAPI.services(1L)

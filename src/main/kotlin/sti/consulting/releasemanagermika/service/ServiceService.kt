@@ -8,29 +8,20 @@ import sti.consulting.releasemanagermika.repository.SystemVersionRepository
 import java.util.*
 
 @Service
-class ServiceService {
-
-    @Autowired
-    lateinit var serviceRepository: ServiceRepository;
-
-    @Autowired
-    lateinit var systemVersionRepository: SystemVersionRepository;
+class ServiceService(val serviceRepository: ServiceRepository, val systemVersionRepository: SystemVersionRepository) {
 
     fun deployService(service: sti.consulting.releasemanagermika.model.Service): Long? {
-        val storedService = serviceRepository.findLatestVersionOfServiceByName(service.name);
-        return if (storedService == service) {
-            systemVersionRepository.findLatestVersion()?.version;
-        } else {
-            serviceRepository.save(service);
-
-            val services = serviceRepository.findLatestVersionsOfAllServices();
-            val systemVersion = SystemVersion(services);
-
-            systemVersionRepository.save(systemVersion);
-
-            systemVersionRepository.findLatestVersion()?.version;
+        serviceRepository.findLatestVersionOfServiceByName(service.name)?.let {
+            if (it == service) {
+                return systemVersionRepository.findLatestVersion()?.version
+            }
         }
+
+        serviceRepository.save(service)
+
+        return systemVersionRepository.save(SystemVersion(serviceRepository.findLatestVersionsOfAllServices())).version;
     }
+
 
     fun getSystemVersion(version: Long): Optional<SystemVersion> {
         return systemVersionRepository.findById(version);

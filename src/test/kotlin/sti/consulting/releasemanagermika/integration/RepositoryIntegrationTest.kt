@@ -20,7 +20,7 @@ class RepositoryIntegrationTest {
     lateinit var systemVersionRepository: SystemVersionRepository
 
     @Test
-    fun testServiceRepository() {
+    fun `should save and retrieve latest version of a service by name`() {
         val service = Service(name = "Test Service", version = 1L)
         serviceRepository.save(service)
 
@@ -30,7 +30,7 @@ class RepositoryIntegrationTest {
     }
 
     @Test
-    fun testSystemVersionRepository() {
+    fun `should save and retrieve latest version of a system version`() {
         val service = Service(name = "Test Service", version = 1L)
         serviceRepository.save(service)
 

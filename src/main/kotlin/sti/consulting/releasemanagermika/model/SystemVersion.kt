@@ -16,7 +16,12 @@ class SystemVersion() {
         this.services = services;
     }
 
-    @Id @GeneratedValue val version: Long? = null;
+    constructor(services: List<Service>?, version: Long) : this() {
+        this.version = version;
+    }
+
+    @Id @GeneratedValue
+    var version: Long? = null;
 
     @ManyToMany
     var services: List<Service>? = null;

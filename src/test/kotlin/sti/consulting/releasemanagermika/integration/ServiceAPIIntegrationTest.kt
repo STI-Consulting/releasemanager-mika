@@ -1,7 +1,6 @@
 package sti.consulting.releasemanagermika.integration
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -23,7 +22,7 @@ class ServiceAPIIntegrationTest {
     lateinit var objectMapper: ObjectMapper
 
     @Test
-    fun testDeployIntegration() {
+    fun `should_create_new_deployment_and_return_its_id`() {
         val service = Service(name = "Test Service", version = 1L)
 
         mockMvc.post("/deploy") {
@@ -31,12 +30,12 @@ class ServiceAPIIntegrationTest {
             content = objectMapper.writeValueAsString(service)
         }.andExpect {
             status { isCreated() }
-            jsonPath("$.id") { value(1L) }
+            content {json("1") }
         }
     }
 
     @Test
-    fun testServicesIntegration() {
+    fun `should_return_list_of_services_for_given_system_version`() {
         val service = Service(name = "Test Service", version = 1L)
 
         mockMvc.post("/deploy") {
@@ -44,7 +43,7 @@ class ServiceAPIIntegrationTest {
             content = objectMapper.writeValueAsString(service)
         }.andExpect {
             status { isCreated() }
-            jsonPath("$.id") { value(1L) }
+            content { json("1") }
         }
 
         mockMvc.get("/services?systemVersion=1") {

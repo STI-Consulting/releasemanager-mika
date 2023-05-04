@@ -17,10 +17,7 @@ import sti.consulting.releasemanagermika.service.ServiceService
 import kotlin.jvm.optionals.getOrNull
 
 @RestController
-class ServiceAPI {
-
-    @Autowired
-    lateinit var serviceService: ServiceService;
+class ServiceAPI(private val serviceService: ServiceService) {
 
     @PostMapping("/deploy")
     fun deploy(@RequestBody service: Service): ResponseEntity<Any> {
