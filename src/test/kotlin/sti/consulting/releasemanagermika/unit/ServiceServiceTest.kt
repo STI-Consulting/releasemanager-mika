@@ -14,12 +14,13 @@ import sti.consulting.releasemanagermika.model.SystemVersion
 import sti.consulting.releasemanagermika.repository.ServiceRepository
 import sti.consulting.releasemanagermika.repository.SystemVersionRepository
 import sti.consulting.releasemanagermika.service.ServiceService
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 internal class ServiceServiceTest {
 
     @InjectMocks
-    private lateinit var serviceDeployment: ServiceService;
+    private lateinit var serviceDeployment: ServiceService
 
     @Mock
     private lateinit var serviceRepository: ServiceRepository
@@ -32,31 +33,34 @@ internal class ServiceServiceTest {
 
     @BeforeEach
     fun setUp() {
-        testService = Service( null,"test-service", 1L)
+        testService = Service(null, "test-service", 1L)
         testSystemVersion = SystemVersion(listOf(testService))
-        testSystemVersion.version=1L;
+        testSystemVersion.version = 1L
     }
 
     @Test
-    fun `test deployService when service is already deployed`() {
-        `when`(serviceRepository.findLatestVersionOfServiceByName(testService.name)).thenReturn(testService)
-        `when`(systemVersionRepository.findLatestVersion()).thenReturn(testSystemVersion)
+    fun `test getSystemVersion when version exists`() {
+        // Arrange
+        `when`(testSystemVersion.version?.let { systemVersionRepository.findById(it) }).thenReturn(Optional.of(testSystemVersion))
 
-        val result = serviceDeployment.deployService(testService)
+        // Act
+        val result = testSystemVersion.version?.let { serviceDeployment.getSystemVersion(it) }
 
-        assertEquals(testSystemVersion.version, result)
+        // Assert
+        assertEquals(Optional.of(testSystemVersion), result)
     }
 
     @Test
-    fun `test deployService when service is not deployed`() {
-        `when`(serviceRepository.findLatestVersionOfServiceByName(testService.name)).thenReturn(null)
-        `when`(serviceRepository.save(testService)).thenReturn(testService)
-        `when`(serviceRepository.findLatestVersionsOfAllServices()).thenReturn(listOf(testService))
-        `when`(systemVersionRepository.save(any(SystemVersion::class.java))).thenReturn(testSystemVersion)
+    fun `test getSystemVersion when version does not exist`() {
+        // Arrange
+        `when`(testSystemVersion.version?.let { systemVersionRepository.findById(it) }).thenReturn(Optional.empty())
 
-        val result = serviceDeployment.deployService(testService)
+        // Act
+        val result = testSystemVersion.version?.let { serviceDeployment.getSystemVersion(it) }
 
-        assertEquals(testSystemVersion.version, result)
+        // Assert
+        assertEquals(Optional.empty<SystemVersion>(), result)
     }
 
 }
+

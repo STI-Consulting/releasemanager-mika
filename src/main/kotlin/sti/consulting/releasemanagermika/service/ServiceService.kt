@@ -12,24 +12,30 @@ class ServiceService(val serviceRepository: ServiceRepository, val systemVersion
 
     fun deployService(service: sti.consulting.releasemanagermika.model.Service): Long? {
 
-        //getting the latest deployed service
-        serviceRepository.findTopByOrderByIdDesc()?.let {
-            if (it == service) {
-                return systemVersionRepository.findLatestVersion()?.version
-            }
+        if (serviceAlreadyDeployed(service)) {
+            return systemVersionRepository.findLatestVersion()?.version
         }
 
         serviceRepository.save(service)
 
-
-
-        return systemVersionRepository.save(SystemVersion(serviceRepository.findAll()
-                .groupBy { it.name }.mapValues { it.value.last() }.values.toList())).version
+        return getLatestDeployedVersionOfService();
     }
 
 
     fun getSystemVersion(version: Long): Optional<SystemVersion> {
         return systemVersionRepository.findById(version);
+    }
+
+    private fun getLatestDeployedVersionOfService(): Long? {
+        return systemVersionRepository.save(SystemVersion(serviceRepository.findAll()
+                .groupBy { it.name }.mapValues { it.value.last() }.values.toList())).version
+    }
+
+    private fun serviceAlreadyDeployed(service: sti.consulting.releasemanagermika.model.Service): Boolean {
+        // Get the latest deployed service
+        // Not max version because lower version could be deployed because higher version might be buggy
+        val latestService = serviceRepository.findTopByOrderByIdDesc()
+        return latestService != null && latestService == service
     }
 
 }
