@@ -11,7 +11,9 @@ import java.util.*
 class ServiceService(val serviceRepository: ServiceRepository, val systemVersionRepository: SystemVersionRepository) {
 
     fun deployService(service: sti.consulting.releasemanagermika.model.Service): Long? {
-        serviceRepository.findLatestVersionOfServiceByName(service.name)?.let {
+
+        //getting the latest deployed service
+        serviceRepository.findTopByOrderByIdDesc()?.let {
             if (it == service) {
                 return systemVersionRepository.findLatestVersion()?.version
             }
@@ -19,7 +21,10 @@ class ServiceService(val serviceRepository: ServiceRepository, val systemVersion
 
         serviceRepository.save(service)
 
-        return systemVersionRepository.save(SystemVersion(serviceRepository.findLatestVersionsOfAllServices())).version;
+
+
+        return systemVersionRepository.save(SystemVersion(serviceRepository.findAll()
+                .groupBy { it.name }.mapValues { it.value.last() }.values.toList())).version
     }
 
 

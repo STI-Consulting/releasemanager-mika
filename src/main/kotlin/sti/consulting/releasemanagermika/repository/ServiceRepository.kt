@@ -7,7 +7,12 @@ import sti.consulting.releasemanagermika.model.Service
 
 @Repository
 interface ServiceRepository : JpaRepository<Service, String> {
-    fun findByName(name: String): Service?
+
+    fun findTopByOrderByIdDesc(): Service?
+
+    fun findDistinctTopByOrderByIdDesc(): List<Service>
+
+
     @Query("SELECT s FROM Service s WHERE s.version IN (SELECT MAX(sv.version) FROM Service sv GROUP BY sv.name)")
     fun findLatestVersionsOfAllServices(): List<Service>
 
